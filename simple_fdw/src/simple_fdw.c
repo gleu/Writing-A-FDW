@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
  *
- * my Foreign Data Wrapper for PostgreSQL
+ * simple Foreign Data Wrapper for PostgreSQL
  *
  * Copyright (c) 2013 Guillaume Lelarge
  *
@@ -74,21 +74,17 @@ static void simpleEndForeignScan(ForeignScanState *node);
 /*
  * Helper functions
  */
-static bool myIsValidOption(const char *option, Oid context);
+static bool simpleIsValidOption(const char *option, Oid context);
 static void simpleGetOptions(Oid foreigntableid, char **database, char **table);
 
 /* 
  * structures used by the FDW 
- *
- * These next two are not actually used by my, but something like this
- * will be needed by anything more complicated that does actual work.
- *
  */
 
 /*
  * Describes the valid options for objects that use this wrapper.
  */
-struct myFdwOption
+struct simpleFdwOption
 {
 	const char	*optname;
 	Oid		optcontext;	/* Oid of catalog in which option may appear */
@@ -97,7 +93,7 @@ struct myFdwOption
 /*
  * Describes the valid options for objects that use this wrapper.
  */
-static struct myFdwOption valid_options[] =
+static struct simpleFdwOption valid_options[] =
 {
 
 	/* Connection options */
@@ -172,9 +168,9 @@ simple_fdw_validator(PG_FUNCTION_ARGS)
 	{
 		DefElem	   *def = (DefElem *) lfirst(cell);
 
-		if (!myIsValidOption(def->defname, catalog))
+		if (!simpleIsValidOption(def->defname, catalog))
 		{
-			struct myFdwOption *opt;
+			struct simpleFdwOption *opt;
 			StringInfoData buf;
 
 			/*
@@ -226,9 +222,9 @@ simple_fdw_validator(PG_FUNCTION_ARGS)
  * context is the Oid of the catalog holding the object the option is for.
  */
 static bool
-myIsValidOption(const char *option, Oid context)
+simpleIsValidOption(const char *option, Oid context)
 {
-	struct myFdwOption *opt;
+	struct simpleFdwOption *opt;
 
 	for (opt = valid_options; opt->optname; opt++)
 	{
